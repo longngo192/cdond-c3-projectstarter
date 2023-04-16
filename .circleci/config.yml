@@ -84,9 +84,23 @@ jobs:
             npm install
             npm run test
       - slack/notify:
-           event: fail
-           template: basic_fail_1
-           mentions: "@here"
+          event: fail
+          channel: C0530M9N887
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "*test-frontend have been failed!!! :( *",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
             
       - save_cache:
           paths: [frontend/node_modules]
@@ -339,32 +353,46 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
+      - build-frontend:
+          context: common
+      - build-backend:
+          context: common
       - test-frontend:
+          context: common
           requires: [build-frontend]
       - test-backend:
+          context: common
           requires: [build-backend]
       - scan-backend:
+          context: common
           requires: [build-backend]
       - scan-frontend:
+          context: common
           requires: [build-frontend]
       - deploy-infrastructure:
+          context: common
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
               only: [test-feature-branch]
       - configure-infrastructure:
+          context: common
           requires: [deploy-infrastructure]
       - run-migrations:
+          context: common
           requires: [configure-infrastructure]
       - deploy-frontend:
+          context: common
           requires: [run-migrations]
       - deploy-backend:
+          context: common
           requires: [run-migrations]
       - smoke-test:
+          context: common
           requires: [deploy-backend, deploy-frontend]
       - cloudfront-update:
+          context: common
           requires: [smoke-test]
       - cleanup:
+          context: common
           requires: [cloudfront-update]
