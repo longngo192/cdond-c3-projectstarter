@@ -97,16 +97,16 @@ jobs:
       - checkout
       # Restore from cache
       - restore_cahe:
-        keys:
-         - backend-build
+          keys:
+          - backend-build
          
       # Your job code here
       - run:
-        name: run test backend
-        command: |
-          cd backend
-          npm run test
-          exit 1
+          name: run test backend
+          command: |
+            cd backend
+            npm run test
+            exit 1
             
   scan-frontend:
     docker:
@@ -121,11 +121,11 @@ jobs:
          - frontend-build
       # Your job code here
       - run:
-        name: run scan frontend
-        command: |
-          cd frontend
-          npm run pretest:cov
-          exit 1
+          name: run scan frontend
+          command: |
+            cd frontend
+            npm run pretest:cov
+            exit 1
 
   scan-backend:
     docker:
@@ -136,15 +136,15 @@ jobs:
       - checkout
       # Restore from cache
       - restore_cahe:
-        keys:
-         - backend-build
+          keys:
+            - backend-build
       # Your job code here
       - run:
-        name: run scan backend
-        command: |
-          cd backend
-          npm run lint
-          exit 1
+          name: run scan backend
+          command: |
+            cd backend
+            npm run lint
+            exit 1
 
   deploy-infrastructure:
     docker:
