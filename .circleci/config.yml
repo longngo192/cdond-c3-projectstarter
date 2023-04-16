@@ -124,7 +124,7 @@ jobs:
           name: run scan frontend
           command: |
             cd frontend
-            npm run pretest:cov
+            npm run audit --audit-level=critical --force
             
 
   scan-backend:
@@ -143,7 +143,7 @@ jobs:
           name: run scan backend
           command: |
             cd backend
-            npm run lint
+            npm run audit --audit-level=critical --force
             
 
   deploy-infrastructure:
