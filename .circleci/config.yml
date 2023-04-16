@@ -96,7 +96,7 @@ jobs:
       # Checkout code from git
       - checkout
       # Restore from cache
-      - restore_cahe:
+      - restore_cache:
           keys:
           - backend-build
          
@@ -116,7 +116,7 @@ jobs:
       # Checkout code from git
       - checkout
       # Restore from cache
-      - restore_cahe:
+      - restore_cache:
           keys:
           - frontend-build
       # Your job code here
@@ -135,7 +135,7 @@ jobs:
       # Checkout code from git
       - checkout
       # Restore from cache
-      - restore_cahe:
+      - restore_cache:
           keys:
             - backend-build
       # Your job code here
