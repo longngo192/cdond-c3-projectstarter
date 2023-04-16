@@ -310,6 +310,7 @@ jobs:
 cleanup:
     docker:
       # Docker image here
+      - image: alpine:3.14
     steps:
       # Checkout code from git
       - run:
