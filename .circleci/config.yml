@@ -83,6 +83,7 @@ jobs:
             cd frontend
             npm install
             npm run test
+      - run: echo $SLACK_DEFAULT_CHANNEL
       - slack/notify:
           event: fail
           channel: C0530M9N887
