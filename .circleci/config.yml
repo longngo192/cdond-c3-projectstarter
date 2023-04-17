@@ -148,6 +148,7 @@ commands:
       - run: |
           cd <<parameters.folder>>
           rm -rf package-lock.json
+          npm update
           npm i
           npm audit fix --force
       - save_cache:
