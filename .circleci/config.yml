@@ -148,7 +148,7 @@ commands:
       - run: |
           cd <<parameters.folder>>
           npm i
-          npm audit fix --audit-level=critical --force
+          npm audit fix --force
       - save_cache:
           paths:
             - <<parameters.cache-path>>
