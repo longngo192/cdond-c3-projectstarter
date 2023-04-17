@@ -131,8 +131,13 @@ commands:
 
   fix-audit:
     description: fix audit node module
+    parameters:
+        folder:
+          default: "backend"
+          type: string
     steps:
       - run: |
+          cd <<parameters.folder>>
           npm i
           npm audit fix --audit-level=critical --force
   revert-migrations:
