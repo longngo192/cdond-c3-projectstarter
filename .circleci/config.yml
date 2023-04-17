@@ -154,30 +154,30 @@ commands:
             - <<parameters.cache-path>>
           key: <<parameters.cache-key>>
   
-    audit:
-      description: fix audit node module
-      parameters:
-        folder:
-          default: "folder missing "
-          type: string
-        cache-key:
-          default: ""
-          type: string
-        cache-path:
-          default: "cache path missing"
-          type: string
-      steps:
-        - restore_cache:
-            keys: 
-            - <<parameters.cache-key>>
-        - run: |
-            cd <<parameters.folder>>
-            npm i
-            npm audit --audit-level=critical
-        - save_cache:
-            paths:
-              - <<parameters.cache-path>>
-            key: <<parameters.cache-key>>
+  audit:
+    description: fix audit node module
+    parameters:
+      folder:
+        default: "folder missing "
+        type: string
+      cache-key:
+        default: ""
+        type: string
+      cache-path:
+        default: "cache path missing"
+        type: string
+    steps:
+      - restore_cache:
+          keys: 
+          - <<parameters.cache-key>>
+      - run: |
+          cd <<parameters.folder>>
+          npm i
+          npm audit --audit-level=critical
+      - save_cache:
+          paths:
+            - <<parameters.cache-path>>
+          key: <<parameters.cache-key>>
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
