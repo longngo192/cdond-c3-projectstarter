@@ -302,12 +302,12 @@ jobs:
             - frontend-build
       - fix-audit:
           folder: frontend
-          cache-key: frontend-build
+          cache-key: backend-node-module
           cache-path: frontend/node_modules
       # Your job code here
       - audit:
           folder: frontend
-          cache-key: frontend-build
+          cache-key: backend-node-module
           cache-path: frontend/node_modules
       - notify_slack_pass
       - notify_slack_fail
@@ -326,12 +326,12 @@ jobs:
       # Your job code here
       - fix-audit:
           folder: backend
-          cache-key: backend-build
+          cache-key: backend-node-module
           cache-path: backend/node_modules
       # Your job code here
       - audit:
           folder: backend
-          cache-key: backend-build
+          cache-key: backend-node-module
           cache-path: backend/node_modules
       - notify_slack_pass
       - notify_slack_fail
