@@ -132,15 +132,15 @@ commands:
   fix-audit:
     description: fix audit node module
     parameters:
-        folder:
-          default: "folder missing "
-          type: string
-        cache-key:
-          default: ""
-          type: string
-        cache-path:
-          default: "cache path missing"
-          type: string
+      folder:
+        default: "folder missing "
+        type: string
+      cache-key:
+        default: ""
+        type: string
+      cache-path:
+        default: "cache path missing"
+        type: string
     steps:
       - restore_cache:
           keys: 
@@ -157,15 +157,15 @@ commands:
     audit:
       description: fix audit node module
       parameters:
-          folder:
-            default: "folder missing "
-            type: string
-          cache-key:
-            default: ""
-            type: string
-          cache-path:
-            default: "cache path missing"
-            type: string
+        folder:
+          default: "folder missing "
+          type: string
+        cache-key:
+          default: ""
+          type: string
+        cache-path:
+          default: "cache path missing"
+          type: string
       steps:
         - restore_cache:
             keys: 
