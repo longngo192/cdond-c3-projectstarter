@@ -77,18 +77,21 @@ jobs:
       - checkout
       - restore_cache:
           keys: [frontend-build]
+      - run:  
+          name: check env
+          command: | 
+            echo $SLACK_DEFAULT_CHANNEL
       - run:
           name: run test front-end
           command: |
             cd frontend
             npm install
             npm run test
-      - run: 
-          name: check env
-          command: echo $SLACK_DEFAULT_CHANNEL
+
       - slack/notify:
           event: fail
           channel: C0530M9N887
+          mention: "@here"
           custom: |
             {
               "blocks": [
@@ -130,6 +133,25 @@ jobs:
             npm install
             npm run test
             
+      - slack/notify:
+          event: fail
+          channel: C0530M9N887
+          mention: "@here"
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "*test-frontend have been failed!!! :( *",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
             
   scan-frontend:
     docker:
