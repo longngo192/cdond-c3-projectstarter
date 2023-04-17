@@ -133,13 +133,51 @@ commands:
     description: fix audit node module
     parameters:
         folder:
-          default: "backend"
+          default: "folder missing "
+          type: string
+        cache-key:
+          default: ""
+          type: string
+        cache-path:
+          default: "cache path missing"
           type: string
     steps:
+      - restore_cache:
+          keys: 
+           - <<parameters.cache-key>>
       - run: |
           cd <<parameters.folder>>
           npm i
           npm audit fix --audit-level=critical --force
+      - save_cache:
+          paths:
+            - <<parameters.cache-path>>
+          key: <<parameters.cache-key>>
+  
+    audit:
+      description: fix audit node module
+      parameters:
+          folder:
+            default: "folder missing "
+            type: string
+          cache-key:
+            default: ""
+            type: string
+          cache-path:
+            default: "cache path missing"
+            type: string
+      steps:
+        - restore_cache:
+            keys: 
+            - <<parameters.cache-key>>
+        - run: |
+            cd <<parameters.folder>>
+            npm i
+            npm audit --audit-level=critical
+        - save_cache:
+            paths:
+              - <<parameters.cache-path>>
+            key: <<parameters.cache-key>>
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
@@ -260,12 +298,15 @@ jobs:
       - restore_cache:
           keys:
             - frontend-build
-      - fix-audit
+      - fix-audit:
+          folder: frontend
+          cache-key: frontend-build
+          cache-path: frontend/node_modules
       # Your job code here
-      - run:
-          name: run scan frontend
-          command: |
-            npm audit --audit-level=critical
+      - audit:
+          folder: frontend
+          cache-key: frontend-build
+          cache-path: frontend/node_modules
       - notify_slack_pass
       - notify_slack_fail
 
@@ -281,11 +322,15 @@ jobs:
           keys:
             - backend-build
       # Your job code here
-      - fix-audit
-      - run:
-          name: run scan backend
-          command: |
-            npm audit --audit-level=critical
+      - fix-audit:
+          folder: backend
+          cache-key: backend-build
+          cache-path: backend/node_modules
+      # Your job code here
+      - audit:
+          folder: backend
+          cache-key: backend-build
+          cache-path: backend/node_modules
       - notify_slack_pass
       - notify_slack_fail
 
