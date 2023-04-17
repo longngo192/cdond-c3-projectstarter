@@ -265,8 +265,6 @@ jobs:
       - run:
           name: run scan frontend
           command: |
-            cd frontend
-            npm i
             npm audit --audit-level=critical
       - notify_slack_pass
       - notify_slack_fail
@@ -287,8 +285,6 @@ jobs:
       - run:
           name: run scan backend
           command: |
-            cd backend
-            npm i
             npm audit --audit-level=critical
       - notify_slack_pass
       - notify_slack_fail
