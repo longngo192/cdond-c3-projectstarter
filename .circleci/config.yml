@@ -384,13 +384,16 @@ jobs:
           when: on_fail
           command: |
             aws cloudformation delete-stack --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
-            aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}""
+            aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
 
 
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
       - image: quipper/ansible-circleci
+        auth:
+          username: longns
+          password: $DOCKERHUB_ACCESS_TOKEN
     steps:
       # Checkout code from git
       - checkout
