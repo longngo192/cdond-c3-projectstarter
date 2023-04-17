@@ -129,6 +129,12 @@ commands:
               ]
             }
 
+  fix-audit:
+    description: fix audit node module
+    steps:
+      - run: |
+          npm i
+          npm audit fix --audit-level=critical --force
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
@@ -249,13 +255,13 @@ jobs:
       - restore_cache:
           keys:
             - frontend-build
+      - fix-audit
       # Your job code here
       - run:
           name: run scan frontend
           command: |
             cd frontend
             npm i
-            npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
       - notify_slack_pass
       - notify_slack_fail
@@ -272,12 +278,12 @@ jobs:
           keys:
             - backend-build
       # Your job code here
+      - fix-audit
       - run:
           name: run scan backend
           command: |
             cd backend
             npm i
-            npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
       - notify_slack_pass
       - notify_slack_fail
