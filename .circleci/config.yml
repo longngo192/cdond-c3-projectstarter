@@ -91,7 +91,7 @@ jobs:
       - slack/notify:
           event: fail
           channel: C0530M9N887
-          mention: "@here"
+          mentions: "@here"
           custom: |
             {
               "blocks": [
@@ -132,11 +132,11 @@ jobs:
             cd backend
             npm install
             npm run test
-            
+
       - slack/notify:
           event: fail
           channel: C0530M9N887
-          mention: "@here"
+          mentions: "@here"
           custom: |
             {
               "blocks": [
@@ -145,7 +145,7 @@ jobs:
                   "fields": [
                     {
                       "type": "plain_text",
-                      "text": "*test-frontend have been failed!!! :( *",
+                      "text": "*backend-frontend have been failed!!! :( *",
                       "emoji": true
                     }
                   ]
