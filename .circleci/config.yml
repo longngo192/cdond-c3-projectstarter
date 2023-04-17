@@ -93,21 +93,7 @@ jobs:
           event: fail
           channel: C0530M9N887
           mentions: "@here"
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "plain_text",
-                      "text": "*test-frontend have been failed!!! :( *",
-                      "emoji": true
-                    }
-                  ]
-                }
-              ]
-            }
+          template: basic_fail_1
             
       - save_cache:
           paths: [frontend/node_modules]
@@ -139,21 +125,7 @@ jobs:
           event: fail
           channel: C0530M9N887
           mentions: "@here"
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "plain_text",
-                      "text": "*backend-frontend have been failed!!! :( *",
-                      "emoji": true
-                    }
-                  ]
-                }
-              ]
-            }
+          template: basic_fail_1
             
   scan-frontend:
     docker:
@@ -173,6 +145,11 @@ jobs:
             cd frontend
             npm i
             npm audit --audit-level=critical
+      - slack/notify:
+          event: fail
+          channel: C0530M9N887
+          mentions: "@here"
+          template: basic_fail_1
             
 
   scan-backend:
@@ -193,7 +170,11 @@ jobs:
             cd backend
             npm i
             npm audit --audit-level=critical
-            
+      - slack/notify:
+          event: fail
+          channel: C0530M9N887
+          mentions: "@here"
+          template: basic_fail_1
 
   deploy-infrastructure:
     docker:
