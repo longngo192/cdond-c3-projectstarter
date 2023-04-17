@@ -341,6 +341,9 @@ jobs:
     docker:
       # Docker image here that supports AWS CLI
       - image: cimg/aws
+        auth:
+          username: longns
+          password: $DOCKERHUB_ACCESS_TOKEN
     steps:
       # Checkout code from git
       - checkout
