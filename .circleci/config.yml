@@ -5,19 +5,134 @@ commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
-      # Add parameter here   
+      # Add parameter here
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
             # Your code here
-            
+  notify_slack_pass:
+    steps:
+      - slack/notify:
+          event: pass
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":tada::tada::tada: *Success!*"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Project:*\n${CIRCLE_PROJECT_REPONAME}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*When:*\n$(TZ=Asia/Tokyo date +'%Y/%m/%d %T')"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Job:*\n${CIRCLE_JOB}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author:*\n${CIRCLE_USERNAME}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${CIRCLE_BRANCH}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Tag:*\n${CIRCLE_TAG}"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Job"
+                      },
+                      "url": "${CIRCLE_BUILD_URL}"
+                    }
+                  ]
+                }
+              ]
+            }
+  notify_slack_fail:
+    steps:
+      - slack/notify:
+          event: fail
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":japanese_ogre::japanese_ogre::japanese_ogre: *Failed* :bangbang:"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Project:*\n${CIRCLE_PROJECT_REPONAME}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*When:*\n$(TZ=Asia/Tokyo date +'%Y/%m/%d %T')"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Job:*\n${CIRCLE_JOB}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author:*\n${CIRCLE_USERNAME}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${CIRCLE_BRANCH}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Tag:*\n${CIRCLE_TAG}"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Job"
+                      },
+                      "url": "${CIRCLE_BUILD_URL}"
+                    }
+                  ]
+                }
+              ]
+            }
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
-      # Add parameter here     
+      # Add parameter here
     steps:
       - run:
           name: Revert migrations
@@ -32,7 +147,7 @@ commands:
             #  Add revert code here. You can find this in the Getting Started section.
               
             fi
-            
+
 jobs:
   build-frontend:
     docker:
@@ -47,7 +162,8 @@ jobs:
             cd frontend
             npm install
             npm run build
-            
+      - notify_slack_pass
+      - notify_slack_fail
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -65,21 +181,22 @@ jobs:
             cd backend
             npm install
             npm run build
-             
+      - notify_slack_pass
+      - notify_slack_fail
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
 
   test-frontend:
-    docker: 
+    docker:
       - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
           keys: [frontend-build]
-      - run:  
+      - run:
           name: check env
-          command: | 
+          command: |
             echo $SLACK_DEFAULT_CHANNEL
       - run:
           name: run test front-end
@@ -89,29 +206,26 @@ jobs:
             npm install
             npm run test
 
-      - slack/notify:
-          event: fail
-          channel: C0530M9N887
-          mentions: "@here"
-          template: basic_fail_1
-            
+      - notify_slack_pass
+      - notify_slack_fail
+
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-                
+
   test-backend:
     docker:
       # Docker image here
       - image: cimg/node:13.8.0
-      
+
     steps:
       # Checkout code from git
       - checkout
       # Restore from cache
       - restore_cache:
           keys:
-          - backend-build
-         
+            - backend-build
+
       # Your job code here
       - run:
           name: run test backend
@@ -121,12 +235,9 @@ jobs:
             npm install
             npm run test
 
-      - slack/notify:
-          event: fail
-          channel: C0530M9N887
-          mentions: "@here"
-          template: basic_fail_1
-            
+      - notify_slack_pass
+      - notify_slack_fail
+
   scan-frontend:
     docker:
       # Docker image here
@@ -137,7 +248,7 @@ jobs:
       # Restore from cache
       - restore_cache:
           keys:
-          - frontend-build
+            - frontend-build
       # Your job code here
       - run:
           name: run scan frontend
@@ -145,12 +256,8 @@ jobs:
             cd frontend
             npm i
             npm audit --audit-level=critical
-      - slack/notify:
-          event: fail
-          channel: C0530M9N887
-          mentions: "@here"
-          template: basic_fail_1
-            
+      - notify_slack_pass
+      - notify_slack_fail
 
   scan-backend:
     docker:
@@ -170,11 +277,8 @@ jobs:
             cd backend
             npm i
             npm audit --audit-level=critical
-      - slack/notify:
-          event: fail
-          channel: C0530M9N887
-          mentions: "@here"
-          template: basic_fail_1
+      - notify_slack_pass
+      - notify_slack_fail
 
   deploy-infrastructure:
     docker:
@@ -193,8 +297,8 @@ jobs:
               --template-file .circleci/files/backend.yml \
               #--tags project=your-tag \
               # --stack-name "your back-end \
-              # --parameter-overrides ID="your workflow istack name with workflow id" d"  
-              
+              # --parameter-overrides ID="your workflow istack name with workflow id" d"
+
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -202,18 +306,19 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               #--tags project=your-tag \
               # --stack-name "your front-end stack name with workflow id" \
-              # --parameter-overrides ID="your workflow id"  
-              
+              # --parameter-overrides ID="your workflow id"
+
       - run:
           name: Add back-end ip to ansible inventory
           command: |
             # Your code here
-            
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      # Here's where you will add some code to rollback on failure      
+      - notify_slack_pass
+      - notify_slack_fail
+      # Here's where you will add some code to rollback on failure
 
   configure-infrastructure:
     docker:
@@ -228,13 +333,14 @@ jobs:
           name: Install dependencies
           command: |
             # Your code here
-            
       - run:
           name: Configure server
           command: |
             # Your code here
-            
-      # Here's where you will add some code to rollback on failure      
+      - notify_slack_pass
+      - notify_slack_fail
+
+      # Here's where you will add some code to rollback on failure
 
   run-migrations:
     docker:
@@ -247,13 +353,14 @@ jobs:
           name: Run migrations
           command: |
             # Your code here
-            
+
       - run:
           name: Send migration results to memstash
           command: |
             # Your code here
-            
-     # Here's where you will add some code to rollback on failure      
+      - notify_slack_pass
+      - notify_slack_fail
+      # Here's where you will add some code to rollback on failure
 
   deploy-frontend:
     docker:
@@ -276,8 +383,10 @@ jobs:
           name: Deploy frontend objects
           command: |
             # your code here
-      # Here's where you will add some code to rollback on failure      
-                    
+      - notify_slack_pass
+      - notify_slack_fail
+      # Here's where you will add some code to rollback on failure
+
   deploy-backend:
     docker:
       # Docker image here that supports Ansible
@@ -295,12 +404,14 @@ jobs:
           name: Deploy backend
           command: |
             # your code here
-      # Here's where you will add some code to rollback on failure  
+      - notify_slack_pass
+      - notify_slack_fail
+      # Here's where you will add some code to rollback on failure
 
   smoke-test:
     docker:
       # Lightweight Docker image
-      -  image: alpine:3.14
+      - image: alpine:3.14
     steps:
       # Checkout code from git
       - run:
@@ -319,7 +430,9 @@ jobs:
           name: Frontend smoke test.
           command: |
             # your code here
-      # Here's where you will add some code to rollback on failure  
+      - notify_slack_pass
+      - notify_slack_fail
+      # Here's where you will add some code to rollback on failure
 
   cloudfront-update:
     docker:
@@ -335,7 +448,9 @@ jobs:
           name: Update cloudfront distribution
           command: |
             # your code here
-      # Here's where you will add some code to rollback on failure  
+      - notify_slack_pass
+      - notify_slack_fail
+      # Here's where you will add some code to rollback on failure
 
   cleanup:
     docker:
@@ -356,7 +471,6 @@ jobs:
             then
               # your code here
             fi
-            
 
 workflows:
   default:
