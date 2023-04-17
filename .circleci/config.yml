@@ -173,7 +173,6 @@ commands:
           - <<parameters.cache-key>>
       - run: |
           cd <<parameters.folder>>
-          npm i
           npm audit --audit-level=critical
       - save_cache:
           paths:
