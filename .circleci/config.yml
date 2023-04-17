@@ -151,7 +151,7 @@ commands:
           npm update
           npm i
           npm audit fix --force
-          npm update minimist
+          npm update mkdirp --depth 2
       - save_cache:
           paths:
             - <<parameters.cache-path>>
