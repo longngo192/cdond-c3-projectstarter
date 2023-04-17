@@ -340,7 +340,7 @@ jobs:
   deploy-infrastructure:
     docker:
       # Docker image here that supports AWS CLI
-      - image: cimg/aws
+      - image: cimg/aws:2023.04
         auth:
           username: longns
           password: $DOCKERHUB_ACCESS_TOKEN
@@ -432,7 +432,7 @@ jobs:
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
-      - image: cimg/aws
+      - image: cimg/aws:2023.04
     steps:
       # Checkout code from git
       - checkout
@@ -504,7 +504,7 @@ jobs:
   cloudfront-update:
     docker:
       # Docker image here that supports AWS CLI
-      - image: cimg/aws
+      - image: cimg/aws:2023.04
     steps:
       # Checkout code from git
       - run:
