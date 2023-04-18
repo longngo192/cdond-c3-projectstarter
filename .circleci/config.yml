@@ -398,7 +398,7 @@ jobs:
           username: longns
           password: $DOCKERHUB_ACCESS_TOKEN
     steps:
-     
+      - aws-cli/install
       # Checkout code from git
       - checkout
       - attach_workspace:
@@ -423,7 +423,6 @@ jobs:
             echo $BACKEND_IP
             ssh-keyscan -H $BACKEND_IP >> ~/.ssh/known_hosts
       # Install dependencies
-      - aws-cli/install
       - ansible-playbook/install
       - run:
           name: Install dependencies
