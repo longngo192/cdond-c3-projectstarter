@@ -420,6 +420,7 @@ jobs:
       - run:
           name: add key fingerprint
           command: |
+            echo $BACKEND_IP
             ssh-keyscan -H $BACKEND_IP >> ~/.ssh/known_hosts
       # attach workspace
       - run:
