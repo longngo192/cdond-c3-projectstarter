@@ -371,7 +371,7 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            echo $(aws ec2 describe-instances --instance-ids "${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[*].Instances[*].PublicIpAddress'  --output text) >> .circleci/ansible/inventory.txt
+            echo $(aws ec2 describe-instances --instance-ids "backend-${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[*].Instances[*].PublicIpAddress'  --output text) >> .circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
@@ -397,6 +397,10 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
+      # confirm backend ip
+      - run: 
+          name: check inventory.txt
+          command: cat .circleci/ansible/inventory.txt
       # Add ssh keys with fingerprint
       # attach workspace
       - run:
@@ -570,12 +574,12 @@ workflows:
       - configure-infrastructure:
           context: common
           requires: [deploy-infrastructure]
-          filters:
-             branches:
-               only: [test-feature-branch]
       - run-migrations:
           context: common
           requires: [configure-infrastructure]
+          filters:
+             branches:
+               only: [test-feature-branch]
       - deploy-frontend:
           context: common
           requires: [run-migrations]
