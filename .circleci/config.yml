@@ -400,11 +400,6 @@ jobs:
      
       # Checkout code from git
       - checkout
-      # attach workspace
-      # - run: 
-      #     name: clear inventory.txt
-      #     command: | 
-      #       rm -rf .circleci/ansible/inventory.txt
       - attach_workspace:
           at: ~/
       # confirm backend ip
