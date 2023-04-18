@@ -3,6 +3,7 @@ orbs:
   slack: circleci/slack@4.12.1
   ansible-playbook: orbss/ansible-playbook@0.0.5
   aws-cli: circleci/aws-cli@3.1.5
+  python: circleci/python@2.1.1
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -422,6 +423,8 @@ jobs:
             echo $BACKEND_IP
             ssh-keyscan -H $BACKEND_IP >> ~/.ssh/known_hosts
       # Install dependencies
+      - python/install-packages:
+          pkg-manager: pip
       - ansible-playbook/install
       - aws-cli/install
       - run:
@@ -437,7 +440,7 @@ jobs:
       - notify_slack_fail
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
   run-migrations:
     docker:
