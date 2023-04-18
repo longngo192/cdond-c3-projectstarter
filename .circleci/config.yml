@@ -395,10 +395,16 @@ jobs:
           username: longns
           password: $DOCKERHUB_ACCESS_TOKEN
     steps:
-      - attach_workspace:
-          at: ~/
+     
       # Checkout code from git
       - checkout
+      # attach workspace
+      # - run: 
+      #     name: clear inventory.txt
+      #     command: | 
+      #       rm -rf .circleci/ansible/inventory.txt
+      - attach_workspace:
+          at: ~/
       # confirm backend ip
       - run: 
           name: check inventory.txt
