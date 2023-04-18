@@ -1,17 +1,23 @@
 version: 2.1
 orbs:
   slack: circleci/slack@4.12.1
+  ansible-playbook: orbss/ansible-playbook@0.0.5
+  aws-cli: circleci/aws-cli@3.1.5
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
       # Add parameter here
+      workflow_id: 
+        default: "need work flow id"
+        type: string
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
-            # Your code here
+            aws cloudformation delete-stack --stack-name "udapeople-frontend-<<parameters.workflow_id>>"
+            aws cloudformation delete-stack --stack-name "udapeople-backend-<<parameters.workflow_id>>"
   notify_slack_pass:
     steps:
       - slack/notify:
@@ -379,18 +385,14 @@ jobs:
       - notify_slack_pass
       - notify_slack_fail
       # Here's where you will add some code to rollback on failure
-      - run:
-          name: rollback-on-fail
-          when: on_fail
-          command: |
-            aws cloudformation delete-stack --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
-            aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
 
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
-      - image: quipper/ansible-circleci
+      - image: cimg/base:2023.04
         auth:
           username: longns
           password: $DOCKERHUB_ACCESS_TOKEN
@@ -424,21 +426,21 @@ jobs:
           command: |
             echo $BACKEND_IP
             ssh-keyscan -H $BACKEND_IP >> ~/.ssh/known_hosts
-      # attach workspace
+      # Install dependencies
+      - ansible-playbook/install
+      - aws-cli/install
       - run:
           name: Install dependencies
           command: |
             # Your code here
-      - run:
-          name: Configure server
-          command: |
-            # Your code here
-            cd .circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml
+      - ansible-playbook/playbook:
+          inventory: .circleci/ansible/inventory.txt
+          playbook: .circleci/ansible/configure-server.yml
       - notify_slack_pass
       - notify_slack_fail
-
       # Here's where you will add some code to rollback on failure
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   run-migrations:
     docker:
