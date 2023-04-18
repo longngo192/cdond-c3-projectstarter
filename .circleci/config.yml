@@ -371,7 +371,7 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            echo $(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-"${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[0].Instances[0].PublicIpAddress'  --output text) >> .circleci/ansible/inventory.txt
+            echo $(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-"${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[0].Instances[0].PublicIpAddress'  --output text) > .circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
@@ -400,8 +400,18 @@ jobs:
       # confirm backend ip
       - run: 
           name: check inventory.txt
-          command: cat .circleci/ansible/inventory.txt
+          command: | 
+            export BACKEND_IP=$(cat .circleci/ansible/inventory.txt)
+            echo $BACKEND_IP
       # Add ssh keys with fingerprint
+      - run:
+          name: create ssh private key
+          command: |
+            echo $SSH_KEY > udacity.pem
+      - run:
+          name: add key fingerprint
+          command: |
+            ssh-keyscan -H $BACKEND_IP >> ~/.ssh/known_hosts
       # attach workspace
       - run:
           name: Install dependencies
@@ -411,6 +421,8 @@ jobs:
           name: Configure server
           command: |
             # Your code here
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
       - notify_slack_pass
       - notify_slack_fail
 
