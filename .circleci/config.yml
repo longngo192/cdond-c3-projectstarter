@@ -427,7 +427,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # Your code here
+            # Your code here 
       - ansible-playbook/playbook:
           inventory: .circleci/ansible/inventory.txt
           playbook: .circleci/ansible/configure-server.yml
