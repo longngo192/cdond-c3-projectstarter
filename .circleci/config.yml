@@ -409,14 +409,16 @@ jobs:
       - run: 
           name: check inventory.txt
           command: | 
-            export BACKEND_IP=$(cat .circleci/ansible/inventory.txt)
+            echo 'export BACKEND_IP=$(cat .circleci/ansible/inventory.txt)' >> "$BASH_ENV"
             echo $BACKEND_IP
+            source "$BASH_ENV"
       # Add ssh keys with fingerprint
       - run:
           name: create ssh private key
           command: |
             echo $SSH_KEY > udacity.pem
             chmod 400 udacity.pem
+            cat udacity.pem
       - run:
           name: add key fingerprint
           command: |
