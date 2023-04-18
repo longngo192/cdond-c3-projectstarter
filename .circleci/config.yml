@@ -393,7 +393,7 @@ jobs:
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
-      - image: cimg/base:2023.04
+      - image: cimg/python:3.11.3
         auth:
           username: longns
           password: $DOCKERHUB_ACCESS_TOKEN
@@ -424,8 +424,6 @@ jobs:
             ssh-keyscan -H $BACKEND_IP >> ~/.ssh/known_hosts
       # Install dependencies
       - aws-cli/install
-      - python/install-packages:
-          pkg-manager: pip
       - ansible-playbook/install
       - run:
           name: Install dependencies
