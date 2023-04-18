@@ -407,7 +407,7 @@ jobs:
       - run: 
           name: check inventory.txt
           command: | 
-            echo 'export BACKEND_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values=backend-"${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[0].Instances[0].PublicIpAddress'  --output text)' >> "$BASH_ENV"
+            echo 'export BACKEND_IP=$(sed -n '2p' .circleci/ansible/inventory.txt)' >> "$BASH_ENV"
             echo $BACKEND_IP
             source "$BASH_ENV"
       # Add ssh keys with fingerprint
