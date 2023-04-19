@@ -471,11 +471,7 @@ jobs:
        - run:
           name: Install dependencies
           command: |
-            apk add --update --no-cache tar
-            apk add --update --no-cache gzip
-            apk add --update --no-cache nodejs
-            apk add --update --no-cache npm
-            apk add --update --no-cache curl 
+            apt-get install tar gzip nodejs npm curl
        - run:
            name: Get backend url
            command: |
@@ -519,10 +515,11 @@ jobs:
       # attach workspace
       - attach_workspace:
           at: ~/
+      - ansible-playbook/install
       - run:
           name: Install dependencies
           command: |
-            apk add --update --no-cache ansible tar gzip nodejs npm curl aws-cli
+            apt-get install tar gzip nodejs npm curl aws-cli
       - run:
           name: Deploy backend
           command: |
@@ -571,7 +568,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update --no-cache tar gzip nodejs npm curl aws-cli
+            apt-get install tar gzip nodejs npm curl aws-cli
       - run:
           name: Get backend url and Backend smoke test.
           command: |
@@ -619,14 +616,14 @@ jobs:
   cloudfront-update:
     docker:
       # Docker image here that supports AWS CLI
-      - image: amazon/aws-cli
+      - image: cimg/aws:2023.04
     steps:
       # Checkout code from git
       - checkout
       - run:
           name: Install dependencies
           command: |
-            yum install tar gzip -y
+            apt-get install tar gzip -y
       - run:
           name: Get old stack workflow id
           command: |
@@ -654,13 +651,13 @@ jobs:
       - notify_slack_fail
   cleanup:
     docker:
-      - image: amazon/aws-cli
+      - image: cimg/aws:2023.04
     steps:
       - checkout
       - run:
           name: Install dependencies
           command: |
-            yum install tar gzip -y
+            apt-get install tar gzip -y
       - attach_workspace:
           at: ~/
       - run:
