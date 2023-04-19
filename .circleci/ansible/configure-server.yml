@@ -24,10 +24,6 @@
         force_apt_get: yes
         state: latest
         name:
-          - python-pip
-          - libffi-dev
-          - libmysqlclient-dev
-          - gettext
           - python3
       # Your code here
 
