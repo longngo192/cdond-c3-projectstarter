@@ -4,6 +4,7 @@ orbs:
   ansible-playbook: orbss/ansible-playbook@0.0.5
   aws-cli: circleci/aws-cli@3.1.5
   python: circleci/python@2.0.3
+  node: circleci/node@5.1.0
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -466,12 +467,14 @@ jobs:
     steps:
       # Checkout code from git
        - checkout
+       - node/install: 
+          node-version: 13.8.0
        - attach_workspace:
           at: ~/
        - run:
           name: Install dependencies
           command: |
-            sudo apt-get install tar gzip nodejs npm curl
+            sudo apt-get install tar gzip curl
        - run:
            name: Get backend url
            command: |
@@ -508,6 +511,11 @@ jobs:
     steps:
         # Checkout code from git
       - checkout
+      # install aws cli
+      - aws-cli/install
+
+      - node/install:
+          node-version: 13.8.0
       # Add ssh keys with fingerprint
       - add_ssh_keys:
          fingerprints:
@@ -519,7 +527,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo apt-get install tar gzip nodejs npm curl aws-cli
+            sudo apt-get install tar gzip curl 
       - run:
           name: Deploy backend
           command: |
