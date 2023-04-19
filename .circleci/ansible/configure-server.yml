@@ -25,6 +25,8 @@
         state: latest
         name:
           - python3
+          - curl
+
       # Your code here
 
   # Get the environment variables from CircleCI and add to the EC2 instance
