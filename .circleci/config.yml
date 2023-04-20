@@ -572,10 +572,13 @@ jobs:
     steps:
        # Checkout code from git
       - checkout
+      - node/install:
+          node-version: 13.8.0
+      - aws-cli/install
       - run:
           name: Install dependencies
           command: |
-            sudo apt-get install tar gzip nodejs npm curl aws-cli
+            sudo apt-get install tar gzip curl 
       - run:
           name: Get backend url and Backend smoke test.
           command: |
