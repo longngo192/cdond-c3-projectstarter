@@ -198,6 +198,7 @@ commands:
     steps:
       - run:
           name: Revert migrations
+          when: on_fail
           # Add when this will run
           command: |
             SUCCESS=$(curl --insecure  https://kvdb.io/PDd7s6iYFBGNbVoqYuY9Fu/migration_<<parameters.workflow_id>>)
@@ -385,11 +386,11 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - notify_slack_pass
-      - notify_slack_fail
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - notify_slack_pass
+      - notify_slack_fail
 
 
   configure-infrastructure:
@@ -425,11 +426,12 @@ jobs:
           command: |
             cd .circleci/ansible
             ansible-playbook -i inventory.txt --private-key=udacity.pem configure-server.yml
-      - notify_slack_pass
-      - notify_slack_fail
+
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - notify_slack_pass
+      - notify_slack_fail
 
   run-migrations:
     docker:
@@ -455,11 +457,14 @@ jobs:
             then
                 curl --insecure https://kvdb.io/PDd7s6iYFBGNbVoqYuY9Fu/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
             fi
-      - notify_slack_pass
-      - notify_slack_fail
+
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - revert-migrations:
+            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
+      - notify_slack_pass
+      - notify_slack_fail
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
@@ -502,7 +507,6 @@ jobs:
             workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
        - notify_slack_pass
        - notify_slack_fail
-      # Here's where you will add some code to rollback on failure
 
   deploy-backend:
     docker:
@@ -563,7 +567,6 @@ jobs:
             workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}   
       - notify_slack_pass
       - notify_slack_fail
-      # Here's where you will add some code to rollback on failure
 
   smoke-test:
     docker:
@@ -615,13 +618,13 @@ jobs:
               return 1
             fi
       
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # Here's where you will add some code to rollback on failure
       - revert-migrations:
             workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - notify_slack_pass
       - notify_slack_fail
-      # Here's where you will add some code to rollback on failure
 
   cloudfront-update:
     docker:
@@ -657,6 +660,10 @@ jobs:
             echo OldWorkflowID: cat ~/project/OldWorkflowID.txt
             echo CurrentWorflowID: "${CIRCLE_WORKFLOW_ID:0:7}"
       # Here's where you will add some code to rollback on failure  
+      - revert-migrations:
+            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - notify_slack_pass
       - notify_slack_fail
   cleanup:
