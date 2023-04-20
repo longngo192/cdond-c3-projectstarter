@@ -513,7 +513,6 @@ jobs:
       - checkout
       # install aws cli
       - aws-cli/install
-
       - node/install:
           node-version: 13.8.0
       # Add ssh keys with fingerprint
